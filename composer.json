@@ -1,9 +1,14 @@
 {
-    "name": "smartpay/omnipay-cashfree",
+    "name": "smartsmith/omnipay-cashfree",
     "description": "Cashfree PG Orders API (v2023-08-01) driver for Omnipay",
     "type": "library",
     "license": "MIT",
-    "keywords": ["cashfree", "omnipay", "payment", "gateway"],
+    "keywords": [
+        "cashfree",
+        "omnipay",
+        "payment",
+        "gateway"
+    ],
     "homepage": "https://github.com/SmartSmith/omnipay-cashfree",
     "require": {
         "php": "^8.2",
