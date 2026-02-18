@@ -1,0 +1,11 @@
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+    "cf_order_id": "cf_123456",
+    "order_id": "ORDER_123",
+    "order_status": "ACTIVE",
+    "order_amount": 100.00,
+    "order_currency": "INR",
+    "created_at": "2026-02-18T10:00:00+05:30"
+}

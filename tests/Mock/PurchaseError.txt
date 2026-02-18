@@ -1,0 +1,8 @@
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+
+{
+    "message": "order_id already exists",
+    "code": "order_id_already_exists",
+    "type": "invalid_request_error"
+}
