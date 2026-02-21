@@ -15,7 +15,7 @@ class PurchaseRequest extends AbstractRequest
             'customer_details' => [
                 'customer_id' => $this->getCustomerId() ?: $this->getTransactionId(),
                 'customer_email' => $this->getCustomerEmail() ?: '',
-                'customer_phone' => $this->getCustomerPhone() ?: '9999999999',
+                'customer_phone' => $this->getCustomerPhone() ?: '',
                 'customer_name' => $this->getCustomerName() ?: '',
             ],
             'order_meta' => [],

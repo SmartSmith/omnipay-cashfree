@@ -1,0 +1,14 @@
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+[
+    {
+        "cf_payment_id": 12345678,
+        "order_id": "ORDER_123",
+        "payment_status": "PENDING",
+        "payment_amount": 100.00,
+        "payment_currency": "INR",
+        "payment_group": "net_banking",
+        "payment_message": "Payment is pending"
+    }
+]
