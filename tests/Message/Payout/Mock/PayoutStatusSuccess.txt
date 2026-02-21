@@ -1,0 +1,14 @@
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+    "cf_transfer_id": "CF_TRANSFER_001",
+    "transfer_id": "TXN_PAY_202602_001",
+    "status": "SUCCESS",
+    "status_code": "TRANSFER_SUCCESS",
+    "status_description": "Transfer completed successfully",
+    "transfer_amount": 15000.00,
+    "transfer_mode": "banktransfer",
+    "beneficiary_id": "BENE_001",
+    "utr": "UTR123456789"
+}

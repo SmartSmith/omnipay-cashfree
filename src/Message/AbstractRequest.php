@@ -80,6 +80,26 @@ abstract class AbstractRequest extends OmnipayAbstractRequest
         return $this->setParameter('paymentMethods', $value);
     }
 
+    public function getPayoutClientId(): ?string
+    {
+        return $this->getParameter('payoutClientId');
+    }
+
+    public function setPayoutClientId(?string $value): self
+    {
+        return $this->setParameter('payoutClientId', $value);
+    }
+
+    public function getPayoutClientSecret(): ?string
+    {
+        return $this->getParameter('payoutClientSecret');
+    }
+
+    public function setPayoutClientSecret(?string $value): self
+    {
+        return $this->setParameter('payoutClientSecret', $value);
+    }
+
     protected function getBaseEndpoint(): string
     {
         return $this->getTestMode() ? self::SANDBOX_ENDPOINT : self::PRODUCTION_ENDPOINT;

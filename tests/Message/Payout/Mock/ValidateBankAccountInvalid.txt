@@ -1,0 +1,13 @@
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+    "status": "SUCCESS",
+    "subCode": "200",
+    "message": "Verification completed",
+    "data": {
+        "account_status": "INVALID",
+        "bank_account": "****9999",
+        "ifsc": "HDFC0001234"
+    }
+}

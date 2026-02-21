@@ -9,7 +9,8 @@ use Omnipay\Tests\GatewayTestCase;
 
 class GatewayTest extends GatewayTestCase
 {
-    protected Gateway $gateway;
+    /** @var Gateway */
+    protected $gateway;
 
     public function setUp(): void
     {
