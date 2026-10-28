@@ -1,0 +1,12 @@
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+    "cf_transfer_id": "CF_TRANSFER_001",
+    "transfer_id": "TXN_PAY_202602_001",
+    "status": "PENDING",
+    "status_code": "TRANSFER_INITIATED",
+    "status_description": "Transfer is being processed",
+    "transfer_amount": 15000.00,
+    "beneficiary_id": "BENE_001"
+}

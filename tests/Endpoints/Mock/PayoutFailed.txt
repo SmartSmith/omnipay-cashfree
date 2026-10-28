@@ -1,0 +1,11 @@
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+    "cf_transfer_id": "CF_TRANSFER_002",
+    "transfer_id": "TXN_PAY_202602_002",
+    "status": "FAILED",
+    "status_code": "TRANSFER_FAILED",
+    "status_description": "Beneficiary bank account is invalid",
+    "transfer_amount": 15000.00
+}

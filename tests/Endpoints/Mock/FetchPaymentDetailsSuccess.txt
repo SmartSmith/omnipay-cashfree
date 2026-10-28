@@ -1,0 +1,17 @@
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+[
+    {
+        "cf_payment_id": 12345678,
+        "order_id": "ORDER_123",
+        "payment_status": "SUCCESS",
+        "payment_amount": 100.00,
+        "payment_currency": "INR",
+        "payment_group": "upi",
+        "payment_message": "Payment successful",
+        "bank_reference": "5114925505463",
+        "payment_completion_charges": "945.87",
+        "payment_completion_tax": "170.26"
+    }
+]
