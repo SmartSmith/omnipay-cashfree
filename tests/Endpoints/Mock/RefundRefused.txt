@@ -1,0 +1,8 @@
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+    "message": "refund_amount : should be less than or equal to the order amount. Value received: 500",
+    "code": "refund_amount_invalid",
+    "type": "invalid_request_error"
+}

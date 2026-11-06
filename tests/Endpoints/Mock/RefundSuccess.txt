@@ -1,0 +1,21 @@
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+    "cf_payment_id": 12345678,
+    "cf_refund_id": "1553338",
+    "refund_id": "sp_rf_0001",
+    "order_id": "ORDER_123",
+    "entity": "refund",
+    "refund_amount": 50.5,
+    "refund_currency": "INR",
+    "refund_note": "Order cancelled",
+    "refund_status": "SUCCESS",
+    "refund_arn": "205907959425",
+    "refund_charge": 0,
+    "status_description": "Refund processed successfully",
+    "refund_type": "MERCHANT_INITIATED",
+    "refund_speed": {"requested": "STANDARD", "accepted": "STANDARD", "processed": "STANDARD", "message": null},
+    "created_at": "2026-11-06T22:40:12+05:30",
+    "processed_at": "2026-11-06T22:40:15+05:30"
+}

@@ -1,0 +1,8 @@
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+
+{
+    "message": "refund with refund_id sp_rf_0001 already exists",
+    "code": "refund_already_exists",
+    "type": "invalid_request_error"
+}

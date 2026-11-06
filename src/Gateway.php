@@ -2,14 +2,16 @@
 
 namespace Omnipay\Cashfree;
 
-use Omnipay\Common\AbstractGateway;
-use Omnipay\Cashfree\Message\PurchaseRequest;
 use Omnipay\Cashfree\Message\CompletePurchaseRequest;
 use Omnipay\Cashfree\Message\FetchPaymentDetailsRequest;
+use Omnipay\Cashfree\Message\FetchRefundsRequest;
 use Omnipay\Cashfree\Message\Payout\CreateBeneficiaryRequest;
 use Omnipay\Cashfree\Message\Payout\PayoutRequest;
 use Omnipay\Cashfree\Message\Payout\PayoutStatusRequest;
 use Omnipay\Cashfree\Message\Payout\ValidateBankAccountRequest;
+use Omnipay\Cashfree\Message\PurchaseRequest;
+use Omnipay\Cashfree\Message\RefundRequest;
+use Omnipay\Common\AbstractGateway;
 
 class Gateway extends AbstractGateway
 {
@@ -88,6 +90,16 @@ class Gateway extends AbstractGateway
     public function fetchPaymentDetails(array $parameters = []): FetchPaymentDetailsRequest
     {
         return $this->createRequest(FetchPaymentDetailsRequest::class, $parameters);
+    }
+
+    public function refund(array $parameters = []): RefundRequest
+    {
+        return $this->createRequest(RefundRequest::class, $parameters);
+    }
+
+    public function fetchRefunds(array $parameters = []): FetchRefundsRequest
+    {
+        return $this->createRequest(FetchRefundsRequest::class, $parameters);
     }
 
     // -- Payout Operations --
