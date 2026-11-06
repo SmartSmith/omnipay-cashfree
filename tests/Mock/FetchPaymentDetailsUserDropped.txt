@@ -1,0 +1,15 @@
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+[
+    {
+        "cf_payment_id": 12345679,
+        "order_id": "ORDER_123",
+        "payment_status": "USER_DROPPED",
+        "payment_amount": 100.00,
+        "payment_currency": "INR",
+        "payment_group": "card",
+        "payment_message": "Customer dropped the payment",
+        "payment_time": "2026-11-06T21:02:00+05:30"
+    }
+]
