@@ -43,7 +43,7 @@ class CompletePurchaseResponse extends AbstractResponse
                 return $message;
             }
 
-            return 'Payment attempt ' . $this->data['latest_payment']['payment_status'];
+            return 'Payment attempt '.$this->data['latest_payment']['payment_status'];
         }
 
         $status = $this->data['order_status'] ?? 'UNKNOWN';

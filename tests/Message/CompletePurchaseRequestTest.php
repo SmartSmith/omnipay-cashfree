@@ -3,13 +3,15 @@
 namespace Omnipay\Cashfree\Tests\Message;
 
 use Omnipay\Cashfree\Message\CompletePurchaseRequest;
+use Omnipay\Common\Exception\InvalidRequestException;
+use Omnipay\Common\Exception\InvalidResponseException;
 use Omnipay\Tests\TestCase;
 
 class CompletePurchaseRequestTest extends TestCase
 {
     private CompletePurchaseRequest $request;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->request = new CompletePurchaseRequest($this->getHttpClient(), $this->getHttpRequest());
@@ -21,21 +23,21 @@ class CompletePurchaseRequestTest extends TestCase
         ]);
     }
 
-    public function testGetDataReturnsOrderId(): void
+    public function test_get_data_returns_order_id(): void
     {
         $data = $this->request->getData();
 
         $this->assertSame('ORDER_123', $data['order_id']);
     }
 
-    public function testValidationRequiresTransactionId(): void
+    public function test_validation_requires_transaction_id(): void
     {
         $this->request->setTransactionId(null);
-        $this->expectException(\Omnipay\Common\Exception\InvalidRequestException::class);
+        $this->expectException(InvalidRequestException::class);
         $this->request->getData();
     }
 
-    public function testSendDataCallsCorrectEndpoint(): void
+    public function test_send_data_calls_correct_endpoint(): void
     {
         $this->setMockHttpResponse('CompletePurchasePaid.txt');
         $this->request->send();
@@ -48,7 +50,7 @@ class CompletePurchaseRequestTest extends TestCase
         );
     }
 
-    public function testSandboxEndpointUsedInTestMode(): void
+    public function test_sandbox_endpoint_used_in_test_mode(): void
     {
         $this->setMockHttpResponse('CompletePurchasePaid.txt');
         $this->request->send();
@@ -60,7 +62,7 @@ class CompletePurchaseRequestTest extends TestCase
         );
     }
 
-    public function testAuthHeadersIncluded(): void
+    public function test_auth_headers_included(): void
     {
         $this->setMockHttpResponse('CompletePurchasePaid.txt');
         $this->request->send();
@@ -72,7 +74,7 @@ class CompletePurchaseRequestTest extends TestCase
     }
 
     /** LAUNCH-197: an ACTIVE order whose latest attempt FAILED reads as failed, with Cashfree's reason. */
-    public function testActiveOrderWithFailedAttemptIsFailed(): void
+    public function test_active_order_with_failed_attempt_is_failed(): void
     {
         $this->setMockHttpResponse(['CompletePurchaseActive.txt', 'FetchPaymentDetailsFailed.txt']);
         $response = $this->request->send();
@@ -91,7 +93,7 @@ class CompletePurchaseRequestTest extends TestCase
     }
 
     /** LAUNCH-197: a dropped attempt is over too. */
-    public function testActiveOrderWithUserDroppedAttemptIsFailed(): void
+    public function test_active_order_with_user_dropped_attempt_is_failed(): void
     {
         $this->setMockHttpResponse(['CompletePurchaseActive.txt', 'FetchPaymentDetailsUserDropped.txt']);
         $response = $this->request->send();
@@ -103,7 +105,7 @@ class CompletePurchaseRequestTest extends TestCase
     }
 
     /** An ACTIVE order with no attempt yet stays pending. */
-    public function testActiveOrderWithNoAttemptIsPending(): void
+    public function test_active_order_with_no_attempt_is_pending(): void
     {
         $this->setMockHttpResponse(['CompletePurchaseActive.txt', 'FetchPaymentDetailsEmpty.txt']);
         $response = $this->request->send();
@@ -116,7 +118,7 @@ class CompletePurchaseRequestTest extends TestCase
     }
 
     /** An ACTIVE order whose attempt is pending stays pending. */
-    public function testActiveOrderWithPendingAttemptIsPending(): void
+    public function test_active_order_with_pending_attempt_is_pending(): void
     {
         $this->setMockHttpResponse(['CompletePurchaseActive.txt', 'FetchPaymentDetailsPending.txt']);
         $response = $this->request->send();
@@ -126,7 +128,7 @@ class CompletePurchaseRequestTest extends TestCase
     }
 
     /** The latest attempt is the one with the highest cf_payment_id, wherever Cashfree lists it: a retry after a failure is pending. */
-    public function testRetryAfterFailedAttemptIsPending(): void
+    public function test_retry_after_failed_attempt_is_pending(): void
     {
         $this->setMockHttpResponse(['CompletePurchaseActive.txt', 'FetchPaymentDetailsPendingAfterFailed.txt']);
         $response = $this->request->send();
@@ -136,7 +138,7 @@ class CompletePurchaseRequestTest extends TestCase
     }
 
     /** A PAID order is successful from the order read alone; the payments are not read. */
-    public function testPaidOrderIsSuccessfulWithoutReadingPayments(): void
+    public function test_paid_order_is_successful_without_reading_payments(): void
     {
         $this->setMockHttpResponse('CompletePurchasePaid.txt');
         $response = $this->request->send();
@@ -148,11 +150,11 @@ class CompletePurchaseRequestTest extends TestCase
     }
 
     /** A payments answer that is not a list of payments throws rather than reading as pending. */
-    public function testPaymentsAnswerThatIsNotAListThrows(): void
+    public function test_payments_answer_that_is_not_a_list_throws(): void
     {
         $this->setMockHttpResponse(['CompletePurchaseActive.txt', 'FetchPaymentDetailsNotAList.txt']);
 
-        $this->expectException(\Omnipay\Common\Exception\InvalidResponseException::class);
+        $this->expectException(InvalidResponseException::class);
         $this->request->send();
     }
 }

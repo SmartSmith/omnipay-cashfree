@@ -23,7 +23,7 @@ class CompletePurchaseRequest extends AbstractRequest
 
     public function sendData($data): CompletePurchaseResponse
     {
-        $endpoint = $this->getBaseEndpoint() . '/orders/' . urlencode($data['order_id']);
+        $endpoint = $this->getBaseEndpoint().'/orders/'.urlencode($data['order_id']);
 
         $httpResponse = $this->httpClient->request(
             'GET',
@@ -37,7 +37,7 @@ class CompletePurchaseRequest extends AbstractRequest
         }
 
         if (($responseBody['order_status'] ?? null) === 'ACTIVE') {
-            $latest = $this->latestPayment($endpoint . '/payments');
+            $latest = $this->latestPayment($endpoint.'/payments');
             if ($latest !== null) {
                 $responseBody['latest_payment'] = $latest;
             }
@@ -58,7 +58,7 @@ class CompletePurchaseRequest extends AbstractRequest
         $httpResponse = $this->httpClient->request('GET', $endpoint, $this->getAuthHeaders());
         $payments = json_decode($httpResponse->getBody()->getContents(), true);
         if (! is_array($payments) || ! array_is_list($payments)) {
-            throw new InvalidResponseException('Cashfree answered the order payments read with something other than a list of payments (HTTP ' . $httpResponse->getStatusCode() . ')');
+            throw new InvalidResponseException('Cashfree answered the order payments read with something other than a list of payments (HTTP '.$httpResponse->getStatusCode().')');
         }
 
         $latest = null;
