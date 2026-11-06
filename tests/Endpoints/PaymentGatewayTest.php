@@ -104,17 +104,36 @@ final class PaymentGatewayTest extends EndpointTestCase
         $this->assertSame('Payment successful', $response->getMessage());
     }
 
+    /** LAUNCH-197: an ACTIVE order is read with its payments; with no attempt yet it is still awaiting payment. */
     #[Test]
     public function complete_purchase_reads_an_order_still_awaiting_payment_as_pending(): void
     {
-        $this->setMockHttpResponse('CompletePurchaseActive.txt');
+        $this->setMockHttpResponse(['CompletePurchaseActive.txt', 'FetchPaymentDetailsEmpty.txt']);
 
         $response = $this->gateway->completePurchase(['transactionId' => 'ORDER_123'])->send();
 
-        $this->sent();
+        $requests = $this->getMockClient()->getRequests();
+        $this->assertCount(2, $requests);
+        $this->assertSame('https://sandbox.cashfree.com/pg/orders/ORDER_123/payments', (string) $requests[1]->getUri());
+        $this->assertPgHeaders($requests[1]);
         $this->assertFalse($response->isSuccessful());
         $this->assertTrue($response->isPending());
         $this->assertSame('Payment pending', $response->getMessage());
+    }
+
+    /** LAUNCH-197: an ACTIVE order whose latest attempt FAILED is failed, with Cashfree's reason. */
+    #[Test]
+    public function complete_purchase_reads_an_active_order_whose_attempt_failed_as_failed(): void
+    {
+        $this->setMockHttpResponse(['CompletePurchaseActive.txt', 'FetchPaymentDetailsFailed.txt']);
+
+        $response = $this->gateway->completePurchase(['transactionId' => 'ORDER_123'])->send();
+
+        $this->assertCount(2, $this->getMockClient()->getRequests());
+        $this->assertFalse($response->isSuccessful());
+        $this->assertFalse($response->isPending());
+        $this->assertSame('Insufficient funds in the account', $response->getMessage());
+        $this->assertSame('FAILED', $response->getCode());
     }
 
     #[Test]
