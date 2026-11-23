@@ -104,9 +104,12 @@ final class PaymentGatewayTest extends EndpointTestCase
         $this->assertSame('Payment successful', $response->getMessage());
     }
 
-    /** LAUNCH-197: an ACTIVE order is read with its payments; with no attempt yet it is still awaiting payment. */
+    /**
+     * JUDGE-2376: an ACTIVE order is read with its payments; with no payment attempt the order is over for this
+     * attempt, not pending, so the buyer can pay again.
+     */
     #[Test]
-    public function complete_purchase_reads_an_order_still_awaiting_payment_as_pending(): void
+    public function complete_purchase_reads_an_active_order_with_no_attempt_as_ended(): void
     {
         $this->setMockHttpResponse(['CompletePurchaseActive.txt', 'FetchPaymentDetailsEmpty.txt']);
 
@@ -117,11 +120,12 @@ final class PaymentGatewayTest extends EndpointTestCase
         $this->assertSame('https://sandbox.cashfree.com/pg/orders/ORDER_123/payments', (string) $requests[1]->getUri());
         $this->assertPgHeaders($requests[1]);
         $this->assertFalse($response->isSuccessful());
-        $this->assertTrue($response->isPending());
-        $this->assertSame('Payment pending', $response->getMessage());
+        $this->assertFalse($response->isPending());
+        $this->assertSame('NO_ATTEMPT', $response->getCode());
+        $this->assertSame('No payment was attempted on this order', $response->getMessage());
     }
 
-    /** LAUNCH-197: an ACTIVE order whose latest attempt FAILED is failed, with Cashfree's reason. */
+    /** JUDGE-2376: an ACTIVE order whose latest attempt FAILED is over for this attempt, with Cashfree's reason. */
     #[Test]
     public function complete_purchase_reads_an_active_order_whose_attempt_failed_as_failed(): void
     {
