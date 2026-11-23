@@ -2,8 +2,8 @@
 
 namespace Omnipay\Cashfree\Tests\Message;
 
-use Omnipay\Cashfree\Message\CompletePurchaseResponse;
 use Mockery;
+use Omnipay\Cashfree\Message\CompletePurchaseResponse;
 use Omnipay\Common\Exception\InvalidResponseException;
 use Omnipay\Common\Message\RequestInterface;
 use Omnipay\Tests\TestCase;
@@ -11,9 +11,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class CompletePurchaseResponseTest extends TestCase
 {
-    public function testPaidStatusIsSuccessful(): void
+    public function test_paid_status_is_successful(): void
     {
-        $request = Mockery::mock(\Omnipay\Common\Message\RequestInterface::class);
+        $request = Mockery::mock(RequestInterface::class);
         $response = new CompletePurchaseResponse($request, [
             'cf_order_id' => 'cf_123',
             'order_id' => 'ORDER_123',
@@ -126,9 +126,9 @@ class CompletePurchaseResponseTest extends TestCase
         new CompletePurchaseResponse(Mockery::mock(RequestInterface::class), $order);
     }
 
-    public function testExpiredStatusIsNotSuccessful(): void
+    public function test_expired_status_is_not_successful(): void
     {
-        $request = Mockery::mock(\Omnipay\Common\Message\RequestInterface::class);
+        $request = Mockery::mock(RequestInterface::class);
         $response = new CompletePurchaseResponse($request, [
             'cf_order_id' => 'cf_123',
             'order_id' => 'ORDER_123',
@@ -141,9 +141,9 @@ class CompletePurchaseResponseTest extends TestCase
         $this->assertSame('EXPIRED', $response->getCode());
     }
 
-    public function testTerminatedStatusIsNotSuccessful(): void
+    public function test_terminated_status_is_not_successful(): void
     {
-        $request = Mockery::mock(\Omnipay\Common\Message\RequestInterface::class);
+        $request = Mockery::mock(RequestInterface::class);
         $response = new CompletePurchaseResponse($request, [
             'cf_order_id' => 'cf_123',
             'order_id' => 'ORDER_123',
@@ -156,9 +156,9 @@ class CompletePurchaseResponseTest extends TestCase
         $this->assertSame('TERMINATED', $response->getCode());
     }
 
-    public function testUnknownStatusFallbackMessage(): void
+    public function test_unknown_status_fallback_message(): void
     {
-        $request = Mockery::mock(\Omnipay\Common\Message\RequestInterface::class);
+        $request = Mockery::mock(RequestInterface::class);
         $response = new CompletePurchaseResponse($request, [
             'order_status' => 'SOMETHING_NEW',
         ]);
@@ -167,9 +167,9 @@ class CompletePurchaseResponseTest extends TestCase
         $this->assertSame('Order status: SOMETHING_NEW', $response->getMessage());
     }
 
-    public function testErrorResponseWithMessage(): void
+    public function test_error_response_with_message(): void
     {
-        $request = Mockery::mock(\Omnipay\Common\Message\RequestInterface::class);
+        $request = Mockery::mock(RequestInterface::class);
         $response = new CompletePurchaseResponse($request, [
             'message' => 'order not found',
         ]);
