@@ -5,10 +5,10 @@ namespace Omnipay\Cashfree\Message;
 use Omnipay\Common\Exception\InvalidResponseException;
 
 /**
- * Reads the order. A Cashfree order stays ACTIVE after a failed or dropped attempt (the buyer may retry on
- * it), so for an ACTIVE order the request also reads the order's payments and hands the response the latest
- * attempt under `latest_payment` (LAUNCH-197): the response reads an ACTIVE order whose latest attempt
- * FAILED or was USER_DROPPED as failed, never pending.
+ * Reads the order. A Cashfree order stays ACTIVE while the buyer may still pay on it, so for an ACTIVE order
+ * the request also reads the order's payments and always hands the response `latest_payment`: the latest
+ * attempt, or null when there is none. The response reads an ACTIVE order as pending only while that attempt
+ * is in flight (JUDGE-2376). An order read that is not a JSON object throws.
  */
 class CompletePurchaseRequest extends AbstractRequest
 {
@@ -32,15 +32,12 @@ class CompletePurchaseRequest extends AbstractRequest
         );
 
         $responseBody = json_decode($httpResponse->getBody()->getContents(), true);
-        if (! is_array($responseBody)) {
-            $responseBody = [];
+        if (! is_array($responseBody) || array_is_list($responseBody)) {
+            throw new InvalidResponseException('Cashfree answered the order read with something other than a JSON object (HTTP '.$httpResponse->getStatusCode().')');
         }
 
         if (($responseBody['order_status'] ?? null) === 'ACTIVE') {
-            $latest = $this->latestPayment($endpoint.'/payments');
-            if ($latest !== null) {
-                $responseBody['latest_payment'] = $latest;
-            }
+            $responseBody['latest_payment'] = $this->latestPayment($endpoint.'/payments');
         }
 
         return $this->response = new CompletePurchaseResponse($this, $responseBody);
