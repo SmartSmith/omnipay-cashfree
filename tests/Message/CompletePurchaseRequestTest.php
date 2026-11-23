@@ -6,6 +6,7 @@ use Omnipay\Cashfree\Message\CompletePurchaseRequest;
 use Omnipay\Common\Exception\InvalidRequestException;
 use Omnipay\Common\Exception\InvalidResponseException;
 use Omnipay\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class CompletePurchaseRequestTest extends TestCase
 {
@@ -73,8 +74,11 @@ class CompletePurchaseRequestTest extends TestCase
         $this->assertSame('2023-08-01', $lastRequest->getHeaderLine('x-api-version'));
     }
 
-    /** LAUNCH-197: an ACTIVE order whose latest attempt FAILED reads as failed, with Cashfree's reason. */
-    public function test_active_order_with_failed_attempt_is_failed(): void
+    /**
+     * JUDGE-2376: an ACTIVE order is read with its payments; one whose latest attempt FAILED is over for this
+     * attempt, not pending, its code the attempt status and its message Cashfree's reason.
+     */
+    public function test_active_order_with_failed_attempt_is_ended_with_cashfrees_reason(): void
     {
         $this->setMockHttpResponse(['CompletePurchaseActive.txt', 'FetchPaymentDetailsFailed.txt']);
         $response = $this->request->send();
@@ -92,48 +96,32 @@ class CompletePurchaseRequestTest extends TestCase
         $this->assertSame('test_secret', $requests[1]->getHeaderLine('x-client-secret'));
     }
 
-    /** LAUNCH-197: a dropped attempt is over too. */
-    public function test_active_order_with_user_dropped_attempt_is_failed(): void
-    {
-        $this->setMockHttpResponse(['CompletePurchaseActive.txt', 'FetchPaymentDetailsUserDropped.txt']);
-        $response = $this->request->send();
-
-        $this->assertFalse($response->isSuccessful());
-        $this->assertFalse($response->isPending());
-        $this->assertSame('Customer dropped the payment', $response->getMessage());
-        $this->assertSame('USER_DROPPED', $response->getCode());
-    }
-
-    /** An ACTIVE order with no attempt yet stays pending. */
-    public function test_active_order_with_no_attempt_is_pending(): void
+    /** JUDGE-2376: an ACTIVE order with no payment attempt is over for this attempt: ended, code NO_ATTEMPT. */
+    public function test_active_order_with_no_attempt_is_ended(): void
     {
         $this->setMockHttpResponse(['CompletePurchaseActive.txt', 'FetchPaymentDetailsEmpty.txt']);
         $response = $this->request->send();
 
         $this->assertFalse($response->isSuccessful());
-        $this->assertTrue($response->isPending());
-        $this->assertSame('Payment pending', $response->getMessage());
-        $this->assertSame('ACTIVE', $response->getCode());
+        $this->assertFalse($response->isPending());
+        $this->assertSame('NO_ATTEMPT', $response->getCode());
+        $this->assertSame('No payment was attempted on this order', $response->getMessage());
+        $this->assertSame('ACTIVE', $response->getOrderStatus());
         $this->assertNull($response->getLatestPayment());
     }
 
-    /** An ACTIVE order whose attempt is pending stays pending. */
-    public function test_active_order_with_pending_attempt_is_pending(): void
-    {
-        $this->setMockHttpResponse(['CompletePurchaseActive.txt', 'FetchPaymentDetailsPending.txt']);
-        $response = $this->request->send();
-
-        $this->assertTrue($response->isPending());
-        $this->assertSame('Payment pending', $response->getMessage());
-    }
-
-    /** The latest attempt is the one with the highest cf_payment_id, wherever Cashfree lists it: a retry after a failure is pending. */
-    public function test_retry_after_failed_attempt_is_pending(): void
+    /**
+     * JUDGE-2376: the latest attempt is the one with the highest cf_payment_id, wherever Cashfree lists it: a
+     * retry in flight after a failed attempt is pending.
+     */
+    public function test_retry_in_flight_after_failed_attempt_is_pending(): void
     {
         $this->setMockHttpResponse(['CompletePurchaseActive.txt', 'FetchPaymentDetailsPendingAfterFailed.txt']);
         $response = $this->request->send();
 
+        $this->assertFalse($response->isSuccessful());
         $this->assertTrue($response->isPending());
+        $this->assertSame('Payment pending', $response->getMessage());
         $this->assertSame('PENDING', $response->getLatestPayment()['payment_status']);
     }
 
@@ -146,6 +134,34 @@ class CompletePurchaseRequestTest extends TestCase
         $this->assertTrue($response->isSuccessful());
         $this->assertFalse($response->isPending());
         $this->assertSame('Payment successful', $response->getMessage());
+        $this->assertCount(1, $this->getMockClient()->getRequests());
+    }
+
+    /**
+     * An order read whose body is not a JSON object throws, naming the HTTP status, rather than reading as an
+     * order.
+     *
+     * @return array<string, array{string, string}>
+     */
+    public static function orderReadsThatAreNotAJsonObject(): array
+    {
+        return [
+            'an HTML error page' => ['CompletePurchaseNotAnObject.txt', 'HTTP 502'],
+            'an empty JSON list' => ['FetchPaymentDetailsEmpty.txt', 'HTTP 200'],
+        ];
+    }
+
+    #[DataProvider('orderReadsThatAreNotAJsonObject')]
+    public function test_order_read_that_is_not_a_json_object_throws_naming_the_http_status(string $mock, string $status): void
+    {
+        $this->setMockHttpResponse($mock);
+
+        try {
+            $this->request->send();
+            $this->fail('An order read that is not a JSON object was read as an order.');
+        } catch (InvalidResponseException $thrown) {
+            $this->assertStringContainsString($status, $thrown->getMessage());
+        }
         $this->assertCount(1, $this->getMockClient()->getRequests());
     }
 
